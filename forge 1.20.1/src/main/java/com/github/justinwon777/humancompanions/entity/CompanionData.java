@@ -92,27 +92,6 @@ public class CompanionData {
             Component.literal("I want something else now."),
     };
 
-    public static Class<?>[] alertMobs = new Class<?>[]{
-            Blaze.class,
-            EnderMan.class,
-            Endermite.class,
-            Ghast.class,
-            Giant.class,
-            Guardian.class,
-            Hoglin.class,
-            MagmaCube.class,
-            Phantom.class,
-            Shulker.class,
-            Silverfish.class,
-            Slime.class,
-            Spider.class,
-            Vex.class,
-            AbstractSkeleton.class,
-            Zoglin.class,
-            Zombie.class,
-            Raider.class
-    };
-
     public static Class<?>[] huntMobs = new Class<?>[]{
             Chicken.class,
             Cow.class,

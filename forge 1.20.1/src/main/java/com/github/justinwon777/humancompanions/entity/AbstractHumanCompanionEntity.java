@@ -28,6 +28,7 @@ import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -83,7 +84,6 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
     public SimpleContainer inventory = new SimpleContainer(27);
     public EquipmentSlot[] armorTypes = new EquipmentSlot[]{EquipmentSlot.FEET, EquipmentSlot.LEGS,
             EquipmentSlot.CHEST, EquipmentSlot.HEAD};
-    public List<NearestAttackableTargetGoal> alertMobGoals = new ArrayList<>();
     public List<NearestAttackableTargetGoal> huntMobGoals = new ArrayList<>();
     public PatrolGoal patrolGoal;
     public MoveBackToPatrolGoal moveBackGoal;
@@ -94,6 +94,7 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
     private final Map<String, Integer> foodRequirements = new HashMap<>(Map.of("", 0));
     private String food1 = "";
     private String food2 = "";
+    private final NearestAttackableTargetGoal<LivingEntity> alertHostleGoal; // Store the goal
 
     public AbstractHumanCompanionEntity(EntityType<? extends TamableAnimal> entityType, Level level) {
         super(entityType, level);
@@ -101,12 +102,12 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
 //        this.setCanPickUpLoot(true);
         ((GroundPathNavigation)this.getNavigation()).setCanOpenDoors(true);
         this.getNavigation().setCanFloat(true);
-        for (int i = 0; i < CompanionData.alertMobs.length; i++) {
-            alertMobGoals.add(new NearestAttackableTargetGoal(this, CompanionData.alertMobs[i], false));
-        }
         for (int i = 0; i < CompanionData.huntMobs.length; i++) {
             huntMobGoals.add(new NearestAttackableTargetGoal(this, CompanionData.huntMobs[i], false));
         }
+        alertHostleGoal = new NearestAttackableTargetGoal<>(this, LivingEntity.class, true,
+            entity -> entity instanceof Enemy
+        );
     }
 
     @Override
@@ -757,15 +758,11 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
     }
 
     public void addAlertGoals() {
-        for (NearestAttackableTargetGoal alertMobGoal : alertMobGoals) {
-            this.targetSelector.addGoal(4, alertMobGoal);
-        }
+        this.targetSelector.addGoal(4, alertHostleGoal);
     }
 
     public void removeAlertGoals() {
-        for (NearestAttackableTargetGoal alertMobGoal : alertMobGoals) {
-            this.targetSelector.removeGoal(alertMobGoal);
-        }
+        this.targetSelector.removeGoal(alertHostleGoal);
     }
 
     public void addHuntingGoals() {
